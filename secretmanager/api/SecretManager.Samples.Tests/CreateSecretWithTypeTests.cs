@@ -38,15 +38,20 @@ public class CreateSecretWithTypeTests
     {
         SecretName secretName = new SecretName(_fixture.ProjectId, _fixture.RandomId());
 
-        // Run the sample code.
-        Secret result = _sample.CreateSecretWithType(
-          projectId: secretName.ProjectId, secretId: secretName.SecretId, secretType: secretType);
+        try
+        {
+            // Run the sample code.
+            Secret result = _sample.CreateSecretWithType(
+              projectId: secretName.ProjectId, secretId: secretName.SecretId, secretType: secretType);
 
-        // Assert that the secret was created with the requested type.
-        Assert.Equal(secretName.SecretId, result.SecretName.SecretId);
-        Assert.Equal(secretType, result.SecretType);
-
-        // Clean the created secret.
-        _fixture.DeleteSecret(secretName);
+            // Assert that the secret was created with the requested type.
+            Assert.Equal(secretName.SecretId, result.SecretName.SecretId);
+            Assert.Equal(secretType, result.SecretType);
+        }
+        finally
+        {
+            // Clean the created secret.
+            _fixture.DeleteSecret(secretName);
+        }
     }
 }

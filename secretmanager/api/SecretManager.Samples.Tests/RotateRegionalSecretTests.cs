@@ -34,10 +34,13 @@ public class RotateRegionalSecretTests
     [Fact]
     public void RotatesRegionalSecret()
     {
-        Secret secret = _fixture.CreateCloudSqlCredentialsSecret(_fixture.RandomId());
-        string member = secret.PolicyMember.IamPolicyUidPrincipal;
+        Secret secret = null;
+        string member = null;
         try
         {
+            secret = _fixture.CreateCloudSqlCredentialsSecret(_fixture.RandomId());
+            member = secret.PolicyMember.IamPolicyUidPrincipal;
+
             SecretVersion firstVersion = _enableSample.EnableRegionalSecretManagedRotation(
               secret.SecretName.ProjectId, secret.SecretName.LocationId, secret.SecretName.SecretId,
               _fixture.CloudSqlInstanceId, _fixture.CloudSqlUsername);
@@ -55,8 +58,14 @@ public class RotateRegionalSecretTests
         }
         finally
         {
-            _fixture.DeleteSecret(secret.SecretName);
-            _fixture.RevokeCloudSqlRole(member);
+            if (secret != null)
+            {
+                _fixture.DeleteSecret(secret.SecretName);
+            }
+            if (member != null)
+            {
+                _fixture.RevokeCloudSqlRole(member);
+            }
         }
     }
 }

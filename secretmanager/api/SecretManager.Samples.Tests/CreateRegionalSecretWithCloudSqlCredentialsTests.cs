@@ -34,16 +34,22 @@ public class CreateRegionalSecretWithCloudSqlCredentialsTests
     {
         SecretName secretName = SecretName.FromProjectLocationSecret(_fixture.ProjectId, _fixture.LocationId, _fixture.RandomId());
 
-        // Run the sample code.
-        Secret result = _sample.CreateRegionalSecretWithCloudSqlCredentials(
-          projectId: secretName.ProjectId, locationId: secretName.LocationId, secretId: secretName.SecretId);
+        try
+        {
+            // Run the sample code.
+            Secret result = _sample.CreateRegionalSecretWithCloudSqlCredentials(
+              projectId: secretName.ProjectId, locationId: secretName.LocationId, secretId: secretName.SecretId);
 
-        // Assert that the secret was created with the Cloud SQL secret type.
-        Assert.Equal(secretName.SecretId, result.SecretName.SecretId);
-        Assert.Equal(Secret.Types.SecretType.CloudSqlDbCredentials, result.SecretType);
-        Assert.False(string.IsNullOrEmpty(result.PolicyMember.IamPolicyUidPrincipal));
-
-        // Clean the created secret.
-        _fixture.DeleteSecret(secretName);
+            // Assert that the secret was created with the Cloud SQL secret type.
+            Assert.Equal(secretName.SecretId, result.SecretName.SecretId);
+            Assert.Equal(Secret.Types.SecretType.CloudSqlDbCredentials, result.SecretType);
+            Assert.NotNull(result.PolicyMember);
+            Assert.False(string.IsNullOrEmpty(result.PolicyMember.IamPolicyUidPrincipal));
+        }
+        finally
+        {
+            // Clean the created secret.
+            _fixture.DeleteSecret(secretName);
+        }
     }
 }

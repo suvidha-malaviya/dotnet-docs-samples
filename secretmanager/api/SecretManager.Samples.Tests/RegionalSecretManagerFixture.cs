@@ -144,7 +144,19 @@ public class RegionalSecretManagerFixture : IDisposable, ICollectionFixture<Regi
             SecretType = Secret.Types.SecretType.CloudSqlDbCredentials,
         });
 
-        GrantCloudSqlRole(secret.PolicyMember.IamPolicyUidPrincipal);
+        try
+        {
+            if (secret.PolicyMember?.IamPolicyUidPrincipal == null)
+            {
+                throw new InvalidOperationException("The created regional secret does not have a valid PolicyMember or IamPolicyUidPrincipal.");
+            }
+            GrantCloudSqlRole(secret.PolicyMember.IamPolicyUidPrincipal);
+        }
+        catch
+        {
+            DeleteSecret(secret.SecretName);
+            throw;
+        }
 
         // IAM grants are eventually consistent; give it a moment before a caller
         // tries to use it for managed rotation.
